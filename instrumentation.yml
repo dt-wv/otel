@@ -2,6 +2,7 @@ apiVersion: opentelemetry.io/v1alpha1
 kind: Instrumentation
 metadata:
   name: my-instrumentation
+  name: otel-backend
 spec:
   exporter:
     endpoint: http://otel-collector.otel-backend.svc.cluster.local:4317
