@@ -86,7 +86,7 @@ spec:
           processors: [memory_limiter, batch]
           exporters: [otlphttp]
         metrics:
-          receivers: [hostmetrics,opencensus,otlp,prometheus]
+          receivers: [opencensus,otlp,prometheus]
           processors: [memory_limiter, batch]
           exporters: [otlphttp]
         logs:
