@@ -17,17 +17,17 @@ spec:
         endpoint: 0.0.0.0:8006
 
       # Data sources: metrics
-      hostmetrics:
-        scrapers:
-          cpu:
-          disk:
-          filesystem:
-          load:
-          memory:
-          network:
-          process:
-          processes:
-          paging:
+   #  hostmetrics:
+   #    scrapers:
+   #      cpu:
+   #      disk:
+   #      filesystem:
+   #      load:
+   #      memory:
+   #      network:
+   #      process:
+   #      processes:
+   #      paging:
 
       # Data sources: traces
       jaeger:
