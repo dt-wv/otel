@@ -2,7 +2,7 @@ apiVersion: opentelemetry.io/v1alpha1
 kind: Instrumentation
 metadata:
   name: my-instrumentation
-  name: my-application-namespace
+  namespace: my-application-namespace
 spec:
   exporter:
     endpoint: http://otel-collector-collector.otel-backend.svc.cluster.local:4317
