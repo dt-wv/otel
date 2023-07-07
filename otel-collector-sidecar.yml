@@ -2,7 +2,7 @@ apiVersion: opentelemetry.io/v1alpha1
 kind: OpenTelemetryCollector
 metadata:
   name: otel-collector
-  namespace: otel-backend
+  namespace: 'my application namespace'
 spec:
   image: ghcr.io/open-telemetry/opentelemetry-collector-releases/opentelemetry-collector-contrib:latest
   mode: sidecar # statefulset, daemonset, sidecar
@@ -89,3 +89,60 @@ spec:
           receivers: [fluentforward,otlp]
           processors: [memory_limiter, batch]
           exporters: [logging]
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: otel-collector-collector
+  namespace: 'my application namespace'
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: otel-collector
+  ports:
+    - name: fluentforward
+      port: 8006
+      protocol: TCP
+      targetPort: 8006
+    - appProtocol: grpc
+      name: jaeger-grpc
+      port: 14250
+      protocol: TCP
+      targetPort: 14250
+    - name: jaeger-thrift-binary
+      port: 6832
+      protocol: UDP
+      targetPort: 6832
+    - name: jaeger-thrift-compact
+      port: 6831
+      protocol: UDP
+      targetPort: 6831
+    - appProtocol: http
+      name: jaeger-thrift-http
+      port: 14268
+      protocol: TCP
+      targetPort: 14268
+    - name: opencensus
+      port: 55678
+      protocol: TCP
+      targetPort: 55678
+    - appProtocol: grpc
+      name: otlp-grpc
+      port: 4317
+      protocol: TCP
+      targetPort: 4317
+    - appProtocol: http
+      name: otlp-http
+      port: 4318
+      protocol: TCP
+      targetPort: 4318
+    - appProtocol: http
+      name: otlp-http-legacy
+      port: 55681
+      protocol: TCP
+      targetPort: 4318
+    - appProtocol: http
+      name: zipkin
+      port: 9411
+      protocol: TCP
+      targetPort: 9411
