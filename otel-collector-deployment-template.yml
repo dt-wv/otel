@@ -2,12 +2,47 @@ apiVersion: opentelemetry.io/v1alpha1
 kind: OpenTelemetryCollector
 metadata:
   name: otel-collector
-  namespace: 'my application namespace'
+  namespace: otel-backend
 spec:
   image: ghcr.io/open-telemetry/opentelemetry-collector-releases/opentelemetry-collector-contrib:latest
-  mode: sidecar # statefulset, daemonset, sidecar
+  mode: deployment # statefulset, daemonset, sidecar
+  autoscaler:
+    targetCPUUtilization: 90
+    minReplicas: 1
+    maxReplicas: 5
   config: |
     receivers:
+      # Data sources: logs
+      fluentforward:
+        endpoint: 0.0.0.0:8006
+
+      # Data sources: metrics
+   #  hostmetrics:
+   #    scrapers:
+   #      cpu:
+   #      disk:
+   #      filesystem:
+   #      load:
+   #      memory:
+   #      network:
+   #      process:
+   #      processes:
+   #      paging:
+
+      # Data sources: traces
+      jaeger:
+        protocols:
+          grpc:
+          thrift_binary:
+          thrift_compact:
+          thrift_http:
+
+      # Data sources: traces
+   #  kafka:
+   #    protocol_version: 2.0.0
+
+      # Data sources: traces, metrics
+      opencensus:
 
       # Data sources: traces, metrics, logs
       otlp:
@@ -23,6 +58,9 @@ spec:
     #         scrape_interval: 5s
     #         static_configs:
     #           - targets: [localhost:8888]
+
+      # Data sources: traces
+      zipkin:
 
     processors:
       memory_limiter:
@@ -44,40 +82,14 @@ spec:
     service:
       pipelines:
         traces:
-          receivers: [otlp]
+          receivers: [jaeger,opencensus,otlp,zipkin]
           processors: [memory_limiter, batch]
           exporters: [otlphttp]
         metrics:
-          receivers: [otlp]
+          receivers: [opencensus,otlp]
           processors: [memory_limiter, batch]
           exporters: [otlphttp]
         logs:
-          receivers: [otlp]
+          receivers: [fluentforward,otlp]
           processors: [memory_limiter, batch]
           exporters: [logging]
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: otel-collector-collector
-  namespace: 'my application namespace'
-spec:
-  type: ClusterIP
-  selector:
-    app.kubernetes.io/name: otel-collector
-  ports:
-    - appProtocol: grpc
-      name: otlp-grpc
-      port: 4317
-      protocol: TCP
-      targetPort: 4317
-    - appProtocol: http
-      name: otlp-http
-      port: 4318
-      protocol: TCP
-      targetPort: 4318
-    - appProtocol: http
-      name: otlp-http-legacy
-      port: 55681
-      protocol: TCP
-      targetPort: 4318

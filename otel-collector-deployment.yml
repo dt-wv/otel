@@ -12,38 +12,7 @@ spec:
     maxReplicas: 5
   config: |
     receivers:
-      # Data sources: logs
-      fluentforward:
-        endpoint: 0.0.0.0:8006
-
-      # Data sources: metrics
-   #  hostmetrics:
-   #    scrapers:
-   #      cpu:
-   #      disk:
-   #      filesystem:
-   #      load:
-   #      memory:
-   #      network:
-   #      process:
-   #      processes:
-   #      paging:
-
-      # Data sources: traces
-      jaeger:
-        protocols:
-          grpc:
-          thrift_binary:
-          thrift_compact:
-          thrift_http:
-
-      # Data sources: traces
-   #  kafka:
-   #    protocol_version: 2.0.0
-
-      # Data sources: traces, metrics
-      opencensus:
-
+   
       # Data sources: traces, metrics, logs
       otlp:
         protocols:
@@ -58,9 +27,6 @@ spec:
     #         scrape_interval: 5s
     #         static_configs:
     #           - targets: [localhost:8888]
-
-      # Data sources: traces
-      zipkin:
 
     processors:
       memory_limiter:
@@ -82,14 +48,14 @@ spec:
     service:
       pipelines:
         traces:
-          receivers: [jaeger,opencensus,otlp,zipkin]
+          receivers: [otlp]
           processors: [memory_limiter, batch]
           exporters: [otlphttp]
         metrics:
-          receivers: [opencensus,otlp]
+          receivers: [otlp]
           processors: [memory_limiter, batch]
           exporters: [otlphttp]
         logs:
-          receivers: [fluentforward,otlp]
+          receivers: [otlp]
           processors: [memory_limiter, batch]
           exporters: [logging]

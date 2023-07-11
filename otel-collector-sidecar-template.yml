@@ -8,6 +8,37 @@ spec:
   mode: sidecar # statefulset, daemonset, sidecar
   config: |
     receivers:
+      # Data sources: logs
+      fluentforward:
+        endpoint: 0.0.0.0:8006
+
+      # Data sources: metrics
+   #  hostmetrics:
+   #    scrapers:
+   #      cpu:
+   #      disk:
+   #      filesystem:
+   #      load:
+   #      memory:
+   #      network:
+   #      process:
+   #      processes:
+   #      paging:
+
+      # Data sources: traces
+      jaeger:
+        protocols:
+          grpc:
+          thrift_binary:
+          thrift_compact:
+          thrift_http:
+
+      # Data sources: traces
+   #  kafka:
+   #    protocol_version: 2.0.0
+
+      # Data sources: traces, metrics
+      opencensus:
 
       # Data sources: traces, metrics, logs
       otlp:
@@ -23,6 +54,9 @@ spec:
     #         scrape_interval: 5s
     #         static_configs:
     #           - targets: [localhost:8888]
+
+      # Data sources: traces
+      zipkin:
 
     processors:
       memory_limiter:
@@ -44,15 +78,15 @@ spec:
     service:
       pipelines:
         traces:
-          receivers: [otlp]
+          receivers: [jaeger,opencensus,otlp,zipkin]
           processors: [memory_limiter, batch]
           exporters: [otlphttp]
         metrics:
-          receivers: [otlp]
+          receivers: [opencensus,otlp]
           processors: [memory_limiter, batch]
           exporters: [otlphttp]
         logs:
-          receivers: [otlp]
+          receivers: [fluentforward,otlp]
           processors: [memory_limiter, batch]
           exporters: [logging]
 ---
@@ -66,6 +100,32 @@ spec:
   selector:
     app.kubernetes.io/name: otel-collector
   ports:
+    - name: fluentforward
+      port: 8006
+      protocol: TCP
+      targetPort: 8006
+    - appProtocol: grpc
+      name: jaeger-grpc
+      port: 14250
+      protocol: TCP
+      targetPort: 14250
+    - name: jaeger-thrift-binary
+      port: 6832
+      protocol: UDP
+      targetPort: 6832
+    - name: jaeger-thrift-compact
+      port: 6831
+      protocol: UDP
+      targetPort: 6831
+    - appProtocol: http
+      name: jaeger-thrift-http
+      port: 14268
+      protocol: TCP
+      targetPort: 14268
+    - name: opencensus
+      port: 55678
+      protocol: TCP
+      targetPort: 55678
     - appProtocol: grpc
       name: otlp-grpc
       port: 4317
@@ -81,3 +141,8 @@ spec:
       port: 55681
       protocol: TCP
       targetPort: 4318
+    - appProtocol: http
+      name: zipkin
+      port: 9411
+      protocol: TCP
+      targetPort: 9411
