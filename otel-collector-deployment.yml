@@ -1,3 +1,4 @@
+---
 apiVersion: v1
 kind: Secret
 metadata:
@@ -22,7 +23,7 @@ spec:
       valueFrom:
         secretKeyRef:
           name: dynatrace-secrets
-          key: tenant-id
+          key: environment-id
     - name: API-TOKEN
       valueFrom:
         secretKeyRef:

@@ -1,3 +1,15 @@
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: dynatrace-secrets
+  namespace: otel-backend
+type: Opaque
+stringData:
+  # replace the my-environment-id and my-token-value with the right values
+  environment-id: "my-environment-id"
+  api-token: "my-token-value"
+---
 apiVersion: opentelemetry.io/v1alpha1
 kind: OpenTelemetryCollector
 metadata:
@@ -6,6 +18,17 @@ metadata:
 spec:
   image: ghcr.io/open-telemetry/opentelemetry-collector-releases/opentelemetry-collector-contrib:latest
   mode: deployment # statefulset, daemonset, sidecar
+  env:
+    - name: environment-id
+      valueFrom:
+        secretKeyRef:
+          name: dynatrace-secrets
+          key: environment-id
+    - name: API-TOKEN
+      valueFrom:
+        secretKeyRef:
+           name: dynatrace-secrets
+           key: api-token
   autoscaler:
     targetCPUUtilization: 90
     minReplicas: 1
@@ -75,7 +98,7 @@ spec:
       otlphttp:
          endpoint: "https://${environment-id}.live.dynatrace.com/api/v2/otlp"
          headers:
-           Authorization: "Api-Token ${API_TOKEN}"
+           Authorization: "Api-Token ${API-TOKEN}"
 
       logging:
 
