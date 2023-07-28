@@ -1,0 +1,109 @@
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: dynatrace-secrets
+  namespace: kube-system
+type: Opaque
+stringData:
+  # replace the my-environment-id and my-token-value with the right values
+  environment-id: "my-environment-id"
+  api-token: "my-token-value"
+---
+apiVersion: opentelemetry.io/v1alpha1
+kind: OpenTelemetryCollector
+metadata:
+  name: otel-collector
+  namespace: kube-system
+spec:
+  mode: deployment
+  #modify the tag with the latest version check https://github.com/cilium/hubble-otel/pkgs/container/hubble-otel%2Fotelcol
+  image: ghcr.io/cilium/hubble-otel/otelcol:34b5ba9   
+  autoscaler:
+    targetCPUUtilization: 90
+    minReplicas: 1
+    maxReplicas: 5
+  env:
+    # set NODE_IP environment variable using downwards API
+    - name: environment-id
+      valueFrom:
+        secretKeyRef:
+          name: dynatrace-secrets
+          key: environment-id
+    - name: API-TOKEN
+      valueFrom:
+        secretKeyRef:
+           name: dynatrace-secrets
+           key: api-token
+    - name: NODE_IP
+      valueFrom:
+        fieldRef:
+          fieldPath: status.hostIP
+  volumes:
+    # this example connect to Hubble socket of Cilium agent
+    # using host port and TLS
+    - name: hubble-tls
+      projected:
+        defaultMode: 256
+        sources:
+          - secret:
+              name: hubble-relay-client-certs
+              items:
+                - key: tls.crt
+                  path: client.crt
+                - key: tls.key
+                  path: client.key
+                - key: ca.crt
+                  path: ca.crt
+  volumeMounts:
+    - name: hubble-tls
+      mountPath: /var/run/hubble-tls
+      readOnly: true
+  config: |
+    receivers:
+      otlp:
+        protocols:
+          grpc:
+          http:
+      hubble:
+        # NODE_IP is substituted by the collector at runtime
+        endpoint: ${NODE_IP}:4244   #unix:///var/run/cilium/hubble.sock
+        buffer_size: 100
+        include_flow_types:
+          # this sets an L7 flow filter, removing this section will
+          # disable filtering and result all types of flows being turned
+          # into spans;
+          # other type filters can be set, the names are same as what's
+          # used in 'hubble observe -t <type>'
+          traces: ["trace","l7"]
+        tls:
+          insecure_skip_verify: true
+          ca_file: /var/run/hubble-tls/ca.crt
+          cert_file: /var/run/hubble-tls/client.crt
+          key_file: /var/run/hubble-tls/client.key
+
+    processors:
+      batch:
+        timeout: 30s
+        send_batch_size: 100
+
+
+    exporters:
+      otlphttp:
+         endpoint: "https://${environment-id}.live.dynatrace.com/api/v2/otlp"
+         headers:
+           Authorization: "Api-Token ${API-TOKEN}"
+
+    service:
+      telemetry:
+        logs:
+          level: info
+      pipelines:
+        traces:
+          receivers: [hubble,otlp]
+          processors: [batch]
+          exporters: [otlphttp]
+        metrics:
+          receivers: [otlp]
+          processors: [batch]
+          exporters: [otlphttp]
