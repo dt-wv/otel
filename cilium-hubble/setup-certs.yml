@@ -1,0 +1,31 @@
+---
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  name: self-signed-issuer
+  namespace: cert-manager
+spec:
+  selfSigned: {}
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: ca-certificate
+  namespace: cert-manager
+spec:
+  # name of the tls secret to store
+  # the generated certificate/key pair
+  secretName: ca-key-pair
+  isCA: true
+  issuerRef:
+    name: self-signed-issuer
+    kind: Issuer
+  commonName: "rootCA"
+---
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: ca-issuer
+spec:
+  ca:
+    secretName: ca-key-pair
