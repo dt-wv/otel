@@ -75,6 +75,8 @@ spec:
           # into spans;
           # other type filters can be set, the names are same as what's
           # used in 'hubble observe -t <type>'
+          # adding "trace" to traces adds detailed network events, such as TCP handshakes
+          # alternative traces: ["l7"]
           traces: ["trace","l7"]
         tls:
           insecure_skip_verify: true
