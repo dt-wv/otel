@@ -95,7 +95,7 @@ spec:
         timeout: 10s
 
     exporters:
-      otlphttp:
+      otlphttp/dynatrace:
          endpoint: "https://${environment-id}.live.dynatrace.com/api/v2/otlp"
          headers:
            Authorization: "Api-Token ${API-TOKEN}"
@@ -107,12 +107,12 @@ spec:
         traces:
           receivers: [jaeger,opencensus,otlp,zipkin]
           processors: [memory_limiter, batch]
-          exporters: [otlphttp]
+          exporters: [otlphttp/dynatrace]
         metrics:
           receivers: [opencensus,otlp]
           processors: [memory_limiter, batch]
-          exporters: [otlphttp]
+          exporters: [otlphttp/dynatrace]
         logs:
           receivers: [fluentforward,otlp]
           processors: [memory_limiter, batch]
-          exporters: [logging]
+          exporters: [otlphttp/dynatrace,logging]
