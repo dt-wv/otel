@@ -229,9 +229,9 @@ spec:
            Authorization: "Api-Token ${API-TOKEN}"
     
 
-    #debugging output if required
-    debugoutput:  
-      verbosity: detailed
+      #debugging output if required
+      debug/output:  
+        verbosity: detailed
 
 
     service:
@@ -243,7 +243,7 @@ spec:
         metrics:
           receivers: [prometheus,otlp]
           processors: [memory_limiter, batch, filter/remove]
-          exporters: [otlphttp/dynatrace, debugoutput]
+          exporters: [otlphttp/dynatrace, debug/output]
         logs:
           receivers: [otlp, filelog]
           processors: [memory_limiter, batch]
