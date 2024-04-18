@@ -177,6 +177,20 @@ spec:
       
       batch:
       
+      transform:
+        metric_statements:
+          - context: metric
+            statements:
+              # Get count from the histogram. The new metric name will be <histogram_name>_count
+              - extract_count_metric(true) where type == METRIC_DATA_TYPE_HISTOGRAM
+
+              # Get sum from the histogram. The new metric name will be <histogram_name>_sum
+              - extract_sum_metric(true) where type == METRIC_DATA_TYPE_HISTOGRAM
+          - context: datapoint
+            statements:
+              # convert the <histogram_name>_sum metrics to gauges.
+              - convert_sum_to_gauge() where IsMatch(metric.name, ".*_sum")
+
       filter/remove:
         error_mode: ignore
         metrics:
@@ -230,7 +244,7 @@ spec:
     
 
       #debugging output if required
-      debug/output:  
+      debug:  
         verbosity: detailed
 
 
@@ -242,8 +256,8 @@ spec:
           exporters: [otlphttp/dynatrace]
         metrics:
           receivers: [prometheus,otlp]
-          processors: [memory_limiter, batch, filter/remove]
-          exporters: [otlphttp/dynatrace, debug/output]
+          processors: [memory_limiter, transform, batch, filter/remove]
+          exporters: [otlphttp/dynatrace, debug]
         logs:
           receivers: [otlp, filelog]
           processors: [memory_limiter, batch]
