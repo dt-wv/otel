@@ -1,8 +1,19 @@
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: otel-secrets
+  namespace: "my namespace" #change me
+type: Opaque
+stringData:
+  auth-token: "Authorization=Api-Token%20{token}" #change {token}
+  tenant-url: "https://{your-environment-id}.live.dynatrace.com/api/v2/otlp" #change {environment-id}
+---
 apiVersion: opentelemetry.io/v1alpha1
 kind: Instrumentation
 metadata:
   name: my-instrumentation
-  namespace: my-application-namespace
+  namespace: "my-application-namespace" #change me
 spec:
   propagators:
     - tracecontext
@@ -11,16 +22,28 @@ spec:
     type: parentbased_traceidratio
     argument: "1"
   python:
-    env:.
+    env:
       # Python autoinstrumentation uses http/proto implementation by default
       - name: OTEL_EXPORTER_OTLP_ENDPOINT
-        value: https://{your-environment-id}.live.dynatrace.com/api/v2/otlp
+        valueFrom:
+          secretKeyRef:
+            name: otel-secrets
+            key: tenant-url
       - name: OTEL_EXPORTER_OTLP_HEADERS
-        value: Authorization=Api-Token%20{token}
+        valueFrom: 
+          secretKeyRef:
+            name: otel-secrets
+            key: auth-token
   dotnet:
-    env:.
+    env:
       # .net autoinstrumentation uses http/proto implementation by default
       - name: OTEL_EXPORTER_OTLP_ENDPOINT
-        value: https://{your-environment-id}.live.dynatrace.com/api/v2/otlp
+        valueFrom:
+          secretKeyRef:
+            name: otel-secrets
+            key: tenant-url
       - name: OTEL_EXPORTER_OTLP_HEADERS
-        value: Authorization=Api-Token%20{token}
+        valueFrom: 
+          secretKeyRef:
+            name: otel-secrets
+            key: auth-token
