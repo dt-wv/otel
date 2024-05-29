@@ -22,6 +22,9 @@ spec:
     type: parentbased_traceidratio
     argument: "1"
   python:
+    # when using private registery modify and uncomment
+    # latest image https://github.com/open-telemetry/opentelemetry-operator/pkgs/container/opentelemetry-operator%2Fautoinstrumentation-python
+  # image: your-customized-auto-instrumentation-image:python
     env:
       # Python autoinstrumentation uses http/proto implementation by default
       - name: OTEL_EXPORTER_OTLP_ENDPOINT
