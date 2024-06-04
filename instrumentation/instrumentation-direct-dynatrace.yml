@@ -37,6 +37,10 @@ spec:
           secretKeyRef:
             name: otel-secrets
             key: auth-token
+      - name: OTEL_LOGS_EXPORTER
+        value: otlp_proto_http
+      - name: OTEL_PYTHON_LOGGING_AUTO_INSTRUMENTATION_ENABLED
+        value: 'true'
   dotnet:
     env:
       # .net autoinstrumentation uses http/proto implementation by default
