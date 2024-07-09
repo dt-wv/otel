@@ -19,12 +19,12 @@ spec:
   image: ghcr.io/open-telemetry/opentelemetry-collector-releases/opentelemetry-collector-contrib:latest
   mode: deployment # statefulset, daemonset, sidecar
   env:
-    - name: environment-id
+    - name: environment_id
       valueFrom:
         secretKeyRef:
           name: dynatrace-secrets
           key: environment-id
-    - name: API-TOKEN
+    - name: API_TOKEN
       valueFrom:
         secretKeyRef:
            name: dynatrace-secrets
@@ -96,9 +96,9 @@ spec:
 
     exporters:
       otlphttp/dynatrace:
-         endpoint: "https://${environment-id}.live.dynatrace.com/api/v2/otlp"
+         endpoint: "https://${environment_id}.live.dynatrace.com/api/v2/otlp"
          headers:
-           Authorization: "Api-Token ${API-TOKEN}"
+           Authorization: "Api-Token ${API_TOKEN}"
 
       logging:
 

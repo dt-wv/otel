@@ -69,7 +69,7 @@ spec:
 
     exporters:
       otlphttp/dynatrace:
-         endpoint: "https://${environment-id}.live.dynatrace.com/api/v2/otlp"
+         endpoint: "https://${environment_id}.live.dynatrace.com/api/v2/otlp"
          headers:
            Authorization: "Api-Token ${API_TOKEN}"
 
