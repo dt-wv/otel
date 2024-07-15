@@ -63,14 +63,7 @@ spec:
     targetCPUUtilization: 90
     minReplicas: 1
     maxReplicas: 5
-  volumeMounts:
-  - mountPath: /var/log
-    name: varlog
-    readOnly: true
-  volumes:
-  - name: varlog
-    hostPath:
-      path: /var/log
+    
   config: |
     receivers:
 
