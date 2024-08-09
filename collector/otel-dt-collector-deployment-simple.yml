@@ -157,7 +157,7 @@ spec:
           processors: [memory_limiter, batch, k8sattributes]
           exporters: [otlphttp/dynatrace]
         metrics:
-          receivers: [prometheus,otlp]
+          receivers: [otlp]
           processors: [memory_limiter, batch, transform, filter/remove]
           exporters: [otlphttp/dynatrace]
         logs:
