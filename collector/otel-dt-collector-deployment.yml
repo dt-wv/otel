@@ -34,7 +34,7 @@ stringData:
   environment-id: "my-environment-id"
   api-token: "my-token-value"
 ---
-apiVersion: opentelemetry.io/v1alpha1
+apiVersion: opentelemetry.io/v1beta1
 kind: OpenTelemetryCollector
 metadata:
   name: otel-collector
@@ -71,7 +71,7 @@ spec:
   - name: varlog
     hostPath:
       path: /var/log
-  config: |
+  config:
     receivers:
    
       #scraping the telemetry from the otel-collector https://opentelemetry.io/docs/collector/configuration/#telemetry
@@ -175,7 +175,7 @@ spec:
         limit_percentage: 75
         spike_limit_percentage: 25
       
-      batch:
+      batch: {}
       
       transform:
         metric_statements:

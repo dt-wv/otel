@@ -34,7 +34,7 @@ stringData:
   environment-id: "my-environment-id"
   api-token: "my-token-value"
 ---
-apiVersion: opentelemetry.io/v1alpha1
+apiVersion: opentelemetry.io/v1beta1
 kind: OpenTelemetryCollector
 metadata:
   name: otel-collector
@@ -64,7 +64,7 @@ spec:
     minReplicas: 1
     maxReplicas: 5
     
-  config: |
+  config:
     receivers:
 
       # Data sources: traces, metrics, logs
@@ -82,7 +82,7 @@ spec:
         limit_percentage: 75
         spike_limit_percentage: 25
       
-      batch:
+      batch: {}
       
       transform:
         metric_statements:

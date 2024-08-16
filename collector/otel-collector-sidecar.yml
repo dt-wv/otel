@@ -10,7 +10,7 @@ stringData:
   environment-id: "my-environment-id"
   api-token: "my-token-value"
 ---
-apiVersion: opentelemetry.io/v1alpha1
+apiVersion: opentelemetry.io/v1beta1
 kind: OpenTelemetryCollector
 metadata:
   name: otel-collector
@@ -29,7 +29,7 @@ spec:
         secretKeyRef:
            name: dynatrace-secrets
            key: api-token
-  config: |
+  config:
     receivers:
 
       # Data sources: traces, metrics, logs

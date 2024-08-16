@@ -1,4 +1,4 @@
-apiVersion: opentelemetry.io/v1alpha1
+apiVersion: opentelemetry.io/v1beta1
 kind: OpenTelemetryCollector
 metadata:
   name: otel-collector
@@ -6,7 +6,7 @@ metadata:
 spec:
   image: ghcr.io/open-telemetry/opentelemetry-collector-releases/opentelemetry-collector-contrib:latest
   mode: sidecar # statefulset, daemonset, sidecar
-  config: |
+  config:
     receivers:
       # Data sources: logs
       fluentforward:
@@ -38,7 +38,7 @@ spec:
    #    protocol_version: 2.0.0
 
       # Data sources: traces, metrics
-      opencensus:
+      opencensus: {}
 
       # Data sources: traces, metrics, logs
       otlp:
@@ -56,7 +56,7 @@ spec:
     #           - targets: [localhost:8888]
 
       # Data sources: traces
-      zipkin:
+      zipkin: {}
 
     processors:
       memory_limiter:
@@ -73,7 +73,7 @@ spec:
          headers:
            Authorization: "Api-Token ${API_TOKEN}"
 
-      logging:
+      logging: {}
 
     service:
       pipelines:

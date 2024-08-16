@@ -10,7 +10,7 @@ stringData:
   environment-id: "my-environment-id"
   api-token: "my-token-value"
 ---
-apiVersion: opentelemetry.io/v1alpha1
+apiVersion: opentelemetry.io/v1beta1
 kind: OpenTelemetryCollector
 metadata:
   name: otel-collector
@@ -33,7 +33,7 @@ spec:
     targetCPUUtilization: 90
     minReplicas: 1
     maxReplicas: 5
-  config: |
+  config:
     receivers:
    
       # Data sources: traces, metrics, logs
