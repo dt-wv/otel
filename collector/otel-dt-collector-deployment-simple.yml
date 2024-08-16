@@ -4,6 +4,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   name: otel-collector
+  namespace: otel-backend
 rules:
 - apiGroups: ["","apps"]
   resources: ["pods", "namespaces","replicasets"]
